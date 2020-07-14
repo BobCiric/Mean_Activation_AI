@@ -12,7 +12,7 @@
 %XX = '/step03_FaceNames/FirstLevel/con_0003.nii';
 %Xroi = dir('/Volumes/cerebro/Studies/KLU_APC2/Public/Analysis/misc/ROIs');
 %ROI = {'rHippocampus_L_37.nii','rHippocampus_R_38.nii','LeftBA46.img','RightBA46.img'};
-%subject = csvread('list.txt');
+%subject = importdata('your subject text file.txt',filesep);
 %[mean_activ, AI_table] = activ_table5(X,XX,Xroi,ROI,subject);
 %
 % - Jinghang Li (jil202@pitt.edu) June 25th, 2020
