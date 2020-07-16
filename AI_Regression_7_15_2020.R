@@ -1,3 +1,4 @@
+## @knitr CollectData
 # IMPORTING Data ###########################################################
 data <- read.table("~/Desktop/Github/Mean_Activation_AI/KLU_APC2_Master_2020_07_01.csv", header = TRUE, sep = ",")
 
@@ -123,18 +124,19 @@ executive_attention_icc_scores <- cbind(TRAILAS_Z_INV,TRAILBS_Z_INV,SPANSF_Z,SPA
 executive_attention_icc_values <- icc(executive_attention_icc_scores, model = "twoway", type = "consistency", unit = "single")
 executive_attention_icc <- executive_attention_icc_values$value
 
+## @kntr modelsMake
 # Association with AI ####################################################################
-mdl_hippocampus_AI <- lm(Hippocampus_AI ~ FaceName_PostScanAccuracy+Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
+mdl_hippocampus_AI <- lm(Hippocampus_AI ~ Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
 summary(mdl_hippocampus_AI)
 
-mdl_DLPFC_AI <- lm(DLPFC_AI ~ FaceName_PostScanAccuracy+Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
+mdl_DLPFC_AI <- lm(DLPFC_AI ~  Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
 summary(mdl_DLPFC_AI)
 
 # Association with Absolute AI ####################################################################
-mdl_Abs_hippocampus_AI <- lm(Abs_Hippocampus_AI ~ FaceName_PostScanAccuracy+Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
+mdl_Abs_hippocampus_AI <- lm(Abs_Hippocampus_AI ~ Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
 summary(mdl_Abs_hippocampus_AI)
 
-mdl_Abs_DLPFC_AI <- lm(Abs_DLPFC_AI ~ FaceName_PostScanAccuracy+Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
+mdl_Abs_DLPFC_AI <- lm(Abs_DLPFC_AI ~ Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiB_STATUS_CODE+APOE_CODE, data = data)
 summary(mdl_Abs_DLPFC_AI)
 
 # Association with Activation ###################################################
@@ -321,6 +323,7 @@ summary(mdl_Hippocampus_FWHM_AI)
 mdl_DLPFC_FWHM_AI <- lm(DLPFC_FWHM_AI ~ Age_CurrentVisit+Sex_cat+Race_cat+Education_cat+FDG_SUVR_GTM_FS_Global+PiBStatus_SUVR_GTM_FS_Global+APOE_CODE, data = data)
 summary(mdl_DLPFC_FWHM_AI)
 
+## @knitr DemographicData
 # Demographics Table ###############################################################
 if (!require("kableExtra")) install.packages("kableExtra")
 library(knitr)
@@ -364,10 +367,11 @@ demographic_data <- data.frame(Variable = c("Total_Subjects","n", "Mean", "Stand
 
 kable(demographic_data, caption = "Demographic data for normal aging", digits = 2) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "float_right") %>%
-                pack_rows("Education", 2,6) %>%
-                pack_rows("Age", 7,9) %>%
-                pack_rows("Sex", 10,12) %>%
-                pack_rows("Race", 13,16)
+  pack_rows("Education", 2,6) %>%
+  pack_rows("Age", 7,9) %>%
+  pack_rows("Sex", 10,12) %>%
+  pack_rows("Race", 13,16)
+## @knitr correlationTablesMake
   
 # Correlation Tables ########################################################################
 if (!require("formattable")) install.packages("formattable")
@@ -389,14 +393,36 @@ executive_attention_values <- data.frame("DIGSYMWR_Pearson" = DIGSYMWR_Combo_Pea
 formattable(executive_attention_values, align = "c", caption = "Executive and Attention domain Correlations. Pearson correlations were calcuated between raw scores and domain values.  ICC values were calculated between z-scores of tests within the same domain.", header = c("Pearson Correlations", ""))
 
 # Regression Tables/Plots ######################################################################
+
+#Calculations for Regression Summary
+rsquared <- summary(mdl_hippocampus_AI)$r.squared
+fstat <- summary(mdl_hippocampus_AI)$fstatistic[1]
+df1 <- summary(mdl_hippocampus_AI)$fstatistic[2]
+df2 <- summary(mdl_hippocampus_AI)$fstatistic[3]
+#For p-value
+lmp <- function (modelobject) {
+  if (class(modelobject) != "lm") stop("Not an object of class 'lm' ")
+  f <- summary(modelobject)$fstatistic
+  p <- pf(f[1],f[2],f[3],lower.tail=F)
+  attributes(p) <- NULL
+  return(p)
+}
+pval <- lmp(mdl_hippocampus_AI)
+
 if (!require("sjPlot")) install.packages("sjPlot")
 library(sjPlot)
 
 #Abs_Hippocampus_AI,Abs_DLPFC_AI  ~ FaceName_PostScanAccuracy+Age_CurrentVisit + Sex_cat + Race_cat + Education_cat + FDG_SUVR_GTM_FS_Global + PiB_STATUS_CODE + APOE_CODE
 #p-value: 0.1086 - Hippocampus
 #p-value: 0.1412 - DLPFC
-tab_model(mdl_Abs_hippocampus_AI,mdl_Abs_DLPFC_AI, dv.labels = c("Hippocampus Absolute AI", "DLPFC Absolute AI"),
-          pred.labels = c("Intercept", "Task Accuracy","Age at Visit", "Sex", "Race",
+tab_model(mdl_Abs_hippocampus_AI,mdl_Abs_DLPFC_AI, dv.labels = "Hippocampus Absolute AI",
+          pred.labels = c("Intercept","Age at Visit", "Sex", "Race",
+                          "Education (years)", "FDG Global", 
+                          "PiB Global Status", "APOE Status"), show.rshow.ci = FALSE)
+
+
+tab_model(mdl_Abs_DLPFC_AI, dv.labels = "DLPFC Absolute AI",
+          pred.labels = c("Intercept","Age at Visit", "Sex", "Race",
                           "Education (years)", "FDG Global", 
                           "PiB Global Status", "APOE Status"), show.ci = FALSE)
 
@@ -421,15 +447,15 @@ tab_model(mdl_task_accuracy_abs_DLPFC_AI, dv.labels = "Task Accuracy Vs. Absolut
 
 #Memory ~ Hippocampus AI
 #p-value: 0.07482
-tab_model(mdl_memory_hippocampus, dv.labels = "Memory Vs. Hippocampus Asymmetry Index", show.ci = FALSE)
+tab_model(mdl_memory_hippocampus, dv.labels = "Memory Vs. Hippocampus Asymmetry Index", show.fstat = TRUE, show.p = TRUE, show.ci = FALSE)
 #No relationship between cognitive domains and absolute AI
 
 #memory, REYIM_Z, REYDE_Z ~ FaceName_PostScanAccuracy + Abs_DLPFC_AI + Abs_Hippocampus_AI + Age_CurrentVisit + Sex_cat + Race_cat + Education_cat + FDG_SUVR_GTM_FS_Global + PiB_STATUS_CODE + APOE_CODE
 #None sigificant
-tab_model(mdl_memory_all_abs_AI, mdl_immediate_memory_all_abs_AI,mdl_delayed_memory_all_abs_AI, dv.labels = c("Memory Domain", "REYIM", "REYDE"),
+tab_model(mdl_memory_all_abs_AI, mdl_immediate_memory_all_abs_AI,mdl_delayed_memory_all_abs_AI, show.ci = FALSE, show.p = TRUE, show.fstat= TRUE, dv.labels = c("Memory Domain", "REYIM", "REYDE"),
           pred.labels = c("Intercept", "Task Accuracy","Absolute DLPFC AI", "Absolute Hippocampus AI","Age at Visit", "Sex", "Race",
                           "Education (years)", "FDG Global", 
-                          "PiB Global Status", "APOE Status"), show.ci = FALSE)
+                          "PiB Global Status", "APOE Status"))
 
 #executive ~ FaceName_PostScanAccuracy + Abs_DLPFC_AI +Abs_Hippocampus_AI + Age_CurrentVisit + Sex_cat + Race_cat + Education_cat + FDG_SUVR_GTM_FS_Global + PiB_STATUS_CODE + APOE_CODE
 #p-value: 0.06034 - language
