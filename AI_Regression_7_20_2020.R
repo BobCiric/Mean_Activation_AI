@@ -4,10 +4,10 @@ dev.off()
 pacman::p_load(pacman, rio) 
 library(tibble)
 # IMPORTING Data ###########################################################
-data <- import("/Users/jinghangli/Documents/GitHub/Mean_Activation_AI/Appending_to_Master/KLU_APC2_Master_2020_07_01.xlsx")
-activation <- import("/Users/jinghangli/Documents/GitHub/Mean_Activation_AI/Appending_to_Master/activ_values.txt")
-AI <- import("/Users/jinghangli/Documents/GitHub/Mean_Activation_AI/Appending_to_Master/AI.txt")
-FWHM <- import("/Users/jinghangli/Documents/GitHub/Mean_Activation_AI/Appending_to_Master/activ_deactiv_radius.txt")
+data <- import("GitHub/Mean_Activation_AI/Appending_to_Master/KLU_APC2_Master_2020_07_01.xlsx")
+activation <- import("GitHub/Mean_Activation_AI/Appending_to_Master/activ_values.txt")
+AI <- import("GitHub/Mean_Activation_AI/Appending_to_Master/AI.txt")
+FWHM <- import("GitHub/Mean_Activation_AI/Appending_to_Master/activ_deactiv_radius.txt")
 FWHM <- abs(FWHM)
 # Filter Data ##############################################################
 data <- data[is.na(data$FaceNames_Exclude) & data$Visit_Relative == 1,] #Issues with face name data and only 1 scan/subject - 87 observations
